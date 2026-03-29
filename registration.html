@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AVISHU — Вход</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/other.css">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    
+    .auth-page {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+.auth-brand {
+      background: var(--gray-600);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .auth-brand-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 30% 60%, rgba(80,78,74,0.4) 0%, transparent 60%),
+        linear-gradient(160deg, #1a1a18 0%, #0e0e0c 100%);
+    }
+    .auth-brand-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .auth-brand-logo {
+      position: relative; z-index: 1;
+      height: 55px;
+      width: 155px;
+      filter: invert(1) brightness(0.85);
+    }
+    .auth-brand-quote {
+      position: relative; z-index: 1;
+    }
+    .auth-brand-text {
+      font-family: var(--font-serif);
+      font-size: 42px;
+      font-weight: 300;
+      line-height: 1.2;
+      color: var(--white);
+    }
+    .auth-brand-text em { font-style: italic; color: var(--gray-400); }
+    .auth-brand-sub {
+      font-size: 11px;
+      color: var(--gray-500);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-top: 20px;
+    }
+    .auth-brand-stats {
+      position: relative; z-index: 1;
+      display: flex;
+      gap: 40px;
+      border-top: 1px solid var(--border);
+      padding-top: 28px;
+    }
+    .auth-brand-stat-num {
+      font-family: var(--font-display);
+      font-size: 28px;
+      color: var(--white);
+      letter-spacing: 0.04em;
+    }
+    .auth-brand-stat-label {
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gray-500);
+      margin-top: 4px;
+    }
+
+.auth-panel {
+      background: #0a0a0a;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 72px;
+    }
+    .auth-back {
+      position: absolute;
+      top: 32px; right: 60px;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gray-500);
+      text-decoration: none;
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .auth-back:hover { color: var(--gray-200); }
+    .auth-back::before { content: '←'; }
+
+    .auth-heading {
+      font-family: var(--font-serif);
+      font-size: 36px;
+      font-weight: 300;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+    .auth-sub {
+      font-size: 12px;
+      color: var(--gray-400);
+      letter-spacing: 0.06em;
+      margin-bottom: 48px;
+    }
+
+.step { display: none; }
+    .step.active { display: block; }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 24px 0;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gray-500);
+    }
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: var(--white);
+      border: 1px solid var(--white);
+      color: var(--black);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-weight: 500;
+      transition: all var(--transition);
+      margin-top: 8px;
+      cursor: pointer;
+    }
+    .btn-submit:hover { background: var(--gray-100); }
+    .btn-submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .auth-footer-link {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--gray-500);
+      letter-spacing: 0.06em;
+    }
+    .auth-footer-link a {
+      color: var(--gray-300);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      cursor: pointer;
+    }
+
+.selected-role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gray-600);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      font-size: 11px;
+      color: var(--gray-200);
+      letter-spacing: 0.08em;
+      margin-bottom: 32px;
+    }
+    .badge-change {
+      color: var(--gray-500);
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .badge-change:hover { color: var(--gray-200); }
+
+.auth-mode-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 32px;
+      border: 1px solid var(--border);
+    }
+    .auth-mode-tab {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gray-500);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .auth-mode-tab.active {
+      background: var(--white);
+      color: var(--black);
+    }
+
+.auth-alert {
+      display: none;
+      padding: 12px 16px;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      margin-bottom: 20px;
+      border: 1px solid;
+    }
+    .auth-alert.error {
+      display: block;
+      background: rgba(220, 38, 38, 0.08);
+      border-color: rgba(220, 38, 38, 0.3);
+      color: #fca5a5;
+    }
+    .auth-alert.success {
+      display: block;
+      background: rgba(34, 197, 94, 0.08);
+      border-color: rgba(34, 197, 94, 0.3);
+      color: #86efac;
+    }
+
+.btn-submit .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(0,0,0,0.2);
+      border-top-color: #000;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+.register-fields { display: none; }
+    .register-fields.show { display: block; }
+
+    @media (max-width: 768px) {
+      .auth-page { grid-template-columns: 1fr; }
+      .auth-brand { display: none; }
+      .auth-panel { padding: 40px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor">
+  <div class="cursor-dot"  id="cursorDot"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+</div>
+
+<div class="auth-page">
+
+<div class="auth-brand">
+    <div class="auth-brand-bg"></div>
+    <div class="auth-brand-grid"></div>
+    <img src="public/avishu.png" class="auth-brand-logo" alt="AVISHU">
+    <div class="auth-brand-quote">
+      <div class="auth-brand-text">
+        Технологии<br>
+        <em>встречаются</em><br>
+        с качеством
+      </div>
+      <div class="auth-brand-sub">Clothing Manufacturer · с 2015 года</div>
+    </div>
+    <div class="auth-brand-stats">
+      <div>
+        <div class="auth-brand-stat-num">N</div>
+        <div class="auth-brand-stat-label">Клиентов</div>
+      </div>
+      <div>
+        <div class="auth-brand-stat-num">N</div>
+        <div class="auth-brand-stat-label">Изделий в год</div>
+      </div>
+      <div>
+        <div class="auth-brand-stat-num">N</div>
+        <div class="auth-brand-stat-label">Цехов</div>
+      </div>
+    </div>
+  </div>
+
+<div class="auth-panel" style="position:relative">
+    <a href="home.html" class="auth-back">На главную</a>
+
+<div class="step active" id="step1">
+      <div class="auth-heading">Добро пожаловать</div>
+      <div class="auth-sub">Выберите тип доступа для продолжения</div>
+      <div class="role-cards">
+        <button class="role-card" onclick="selectRole('client')">
+          <div>
+            <div class="role-name">Клиент</div>
+            <div class="role-desc">Просмотр 3D моделей и проверка качества ткани</div>
+          </div>
+          <span class="role-arrow">→</span>
+        </button>
+        <button class="role-card" onclick="selectRole('franchisee')">
+          <div>
+            <div class="role-name">Франчайзи</div>
+            <div class="role-desc">Метрики доходов, аналитика и управление цехами</div>
+          </div>
+          <span class="role-arrow">→</span>
+        </button>
+      </div>
+    </div>
+
+<div class="step" id="step2">
+      <div class="auth-heading" id="authTitle">Войти</div>
+      <div class="auth-sub" id="authSubtitle">Введите ваши данные для входа</div>
+
+      <div class="selected-role-badge" id="roleBadge">
+        <span id="roleLabel">Клиент</span>
+        <span class="badge-change" onclick="backToStep1()">Изменить</span>
+      </div>
+
+<div class="auth-mode-tabs">
+        <button class="auth-mode-tab active" id="tabLogin" onclick="switchMode('login')">Вход</button>
+        <button class="auth-mode-tab" id="tabRegister" onclick="switchMode('register')">Регистрация</button>
+      </div>
+
+<div class="auth-alert" id="authAlert"></div>
+
+      <div class="auth-form" id="authForm">
+        
+        <div class="register-fields" id="registerFields">
+          <div class="form-group">
+            <label class="form-label" for="displayName">Имя</label>
+            <input type="text" id="displayName" class="form-input" placeholder="Ваше имя">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">Email</label>
+          <input type="email" id="email" class="form-input" placeholder="you@example.com">
+          <span class="form-error" id="emailError">Введите корректный email</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="password">Пароль</label>
+          <input type="password" id="password" class="form-input" placeholder="••••••••">
+          <span class="form-error" id="passwordError">Минимум 6 символов</span>
+        </div>
+        <button class="btn-submit" id="btnSubmit" onclick="handleSubmit()">
+          Войти
+        </button>
+      </div>
+
+      <div class="auth-divider">или</div>
+
+<button class="btn-ghost" style="width:100%;padding:12px;text-align:center" onclick="handleDemoLogin()">
+        Демо-доступ (без регистрации)
+      </button>
+
+      <div class="auth-footer-link" id="footerLink">
+        Нет аккаунта? <a onclick="switchMode('register')">Зарегистрироваться</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="src/main.js"></script>
+<script src="src/supabase.js"></script>
+<script>
+  let selectedRole = null;
+  let authMode = 'login'; 
+
+function selectRole(role) {
+    selectedRole = role;
+    document.getElementById('step1').classList.remove('active');
+    document.getElementById('step2').classList.add('active');
+    document.getElementById('roleLabel').textContent = role === 'client' ? 'Клиент' : 'Франчайзи';
+  }
+
+  function backToStep1() {
+    document.getElementById('step2').classList.remove('active');
+    document.getElementById('step1').classList.add('active');
+    hideAlert();
+  }
+
+function switchMode(mode) {
+    authMode = mode;
+    hideAlert();
+
+    const tabLogin    = document.getElementById('tabLogin');
+    const tabRegister = document.getElementById('tabRegister');
+    const regFields   = document.getElementById('registerFields');
+    const btnSubmit   = document.getElementById('btnSubmit');
+    const title       = document.getElementById('authTitle');
+    const subtitle    = document.getElementById('authSubtitle');
+    const footer      = document.getElementById('footerLink');
+
+    if (mode === 'register') {
+      tabLogin.classList.remove('active');
+      tabRegister.classList.add('active');
+      regFields.classList.add('show');
+      btnSubmit.textContent = 'Зарегистрироваться';
+      title.textContent = 'Регистрация';
+      subtitle.textContent = 'Создайте аккаунт для доступа к платформе';
+      footer.innerHTML = 'Уже есть аккаунт? <a onclick="switchMode(\'login\')">Войти</a>';
+    } else {
+      tabRegister.classList.remove('active');
+      tabLogin.classList.add('active');
+      regFields.classList.remove('show');
+      btnSubmit.textContent = 'Войти';
+      title.textContent = 'Войти';
+      subtitle.textContent = 'Введите ваши данные для входа';
+      footer.innerHTML = 'Нет аккаунта? <a onclick="switchMode(\'register\')">Зарегистрироваться</a>';
+    }
+  }
+
+function showAlert(msg, type = 'error') {
+    const el = document.getElementById('authAlert');
+    el.textContent = msg;
+    el.className = `auth-alert ${type}`;
+  }
+  function hideAlert() {
+    document.getElementById('authAlert').className = 'auth-alert';
+  }
+
+async function handleSubmit() {
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const btn      = document.getElementById('btnSubmit');
+    let valid = true;
+
+const emailErr = document.getElementById('emailError');
+    const passErr  = document.getElementById('passwordError');
+    emailErr.classList.remove('show');
+    passErr.classList.remove('show');
+    hideAlert();
+
+    if (!email.includes('@')) { emailErr.classList.add('show'); valid = false; }
+    if (password.length < 6)  { passErr.classList.add('show');  valid = false; }
+    if (!valid) return;
+
+btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>' + (authMode === 'login' ? 'Вход...' : 'Регистрация...');
+
+    try {
+      if (authMode === 'register') {
+        
+        const displayName = document.getElementById('displayName').value.trim();
+
+const resp = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            password,
+            role: selectedRole || 'client',
+            displayName: displayName || email.split('@')[0],
+          }),
+        });
+
+        const result = await resp.json();
+        
+        if (!resp.ok) {
+          showAlert(result.error || 'Ошибка регистрации', 'error');
+          resetBtn();
+          return;
+        }
+
+        if (result.token) {
+          localStorage.setItem('avishu_token', result.token);
+          localStorage.setItem('avishu_refresh_token', result.refreshToken || '');
+          localStorage.setItem('avishu_role', selectedRole || 'client');
+          localStorage.setItem('avishu_user', JSON.stringify({
+            id: result.user?.id,
+            email: email,
+            role: selectedRole || 'client',
+            display_name: displayName || email.split('@')[0],
+          }));
+
+if (typeof setSessionFromTokens === 'function' && result.refreshToken) {
+            await setSessionFromTokens(result.token, result.refreshToken);
+          }
+
+          showAlert('Аккаунт создан! Перенаправление...', 'success');
+          setTimeout(() => redirectByRole(), 800);
+        } else {
+          showAlert(result.message || 'Аккаунт создан. Войдите с вашими данными.', 'success');
+          switchMode('login');
+          resetBtn();
+        }
+
+      } else {
+        
+        const resp = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const result = await resp.json();
+
+        if (!resp.ok) {
+          showAlert(result.error || 'Неверный email или пароль', 'error');
+          resetBtn();
+          return;
+        }
+
+        localStorage.setItem('avishu_token', result.token);
+        localStorage.setItem('avishu_refresh_token', result.refreshToken || '');
+        localStorage.setItem('avishu_role', result.role || 'client');
+        localStorage.setItem('avishu_user', JSON.stringify({
+          id: result.user?.id,
+          email: result.user?.email || email,
+          role: result.role || 'client',
+          display_name: result.user?.user_metadata?.display_name || email.split('@')[0],
+        }));
+
+if (selectedRole) {
+          localStorage.setItem('avishu_role', selectedRole);
+        }
+
+if (typeof setSessionFromTokens === 'function' && result.refreshToken) {
+          await setSessionFromTokens(result.token, result.refreshToken);
+        }
+
+        showAlert('Успешный вход! Перенаправление...', 'success');
+        setTimeout(() => redirectByRole(), 500);
+      }
+
+    } catch (err) {
+      console.error('[Auth]', err);
+      showAlert('Сервер недоступен. Попробуйте демо-доступ.', 'error');
+      resetBtn();
+    }
+  }
+
+  function resetBtn() {
+    const btn = document.getElementById('btnSubmit');
+    btn.disabled = false;
+    btn.textContent = authMode === 'login' ? 'Войти' : 'Зарегистрироваться';
+  }
+
+  function redirectByRole() {
+    const role = selectedRole || localStorage.getItem('avishu_role') || 'client';
+    window.location.href = role === 'client' ? 'demo.html' : 'dashboards.html';
+  }
+
+function handleDemoLogin() {
+    if (!selectedRole) { backToStep1(); return; }
+
+if (typeof demoLoginAs === 'function') {
+      demoLoginAs(selectedRole);
+    } else {
+      localStorage.setItem('avishu_token', 'demo_token');
+      localStorage.setItem('avishu_role', selectedRole);
+      localStorage.setItem('avishu_user', JSON.stringify({
+        id: 'demo-user',
+        email: 'demo@avishu.kz',
+        role: selectedRole,
+        display_name: 'Демо-пользователь',
+      }));
+      window.location.href = selectedRole === 'client' ? 'demo.html' : 'dashboards.html';
+    }
+  }
+
+(async function checkExistingSession() {
+    const token = localStorage.getItem('avishu_token');
+    const role  = localStorage.getItem('avishu_role');
+    if (token && role) {
+      
+      if (token === 'demo_token') {
+        
+        redirectByRole();
+        return;
+      }
+      
+      if (typeof restoreSession === 'function') {
+        const session = await restoreSession();
+        if (session) {
+          
+          redirectByRole();
+          return;
+        }
+        
+      }
+    }
+  })();
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && document.getElementById('step2').classList.contains('active')) {
+      handleSubmit();
+    }
+  });
+</script>
+</body>
+</html>

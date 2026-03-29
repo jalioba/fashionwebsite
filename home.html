@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AVISHU — Главная</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/other.css">
+</head>
+
+<body>
+
+<div class="cursor" id="cursor">
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+  </div>
+
+<nav id="nav">
+    <a href="home.html" class="nav-logo">
+      <img src="public/avishu.png" alt="AVISHU">
+    </a>
+    <ul class="nav-links">
+      <li><a href="home.html" class="active">Главная</a></li>
+      <li><a href="app.html">Приложение</a></li>
+      
+    </ul>
+    <button class="btn-login" onclick="openModal()">Войти</button>
+  </nav>
+
+<div class="modal-overlay" id="modal">
+    <div class="modal">
+      <img src="public/avishu.png" class="modal-logo" alt="AVISHU">
+      <div class="modal-title">Добро пожаловать</div>
+      <div class="modal-sub">Выберите тип входа для продолжения</div>
+      <div class="role-cards">
+        <button class="role-card" onclick="loginAs('client')">
+          <div>
+            <div class="role-name">Клиент</div>
+            <div class="role-desc">Просмотр 3D моделей и проверка качества</div>
+          </div>
+          <span class="role-arrow">→</span>
+        </button>
+        <button class="role-card" onclick="loginAs('franchisee')">
+          <div>
+            <div class="role-name">Франчайзи</div>
+            <div class="role-desc">Метрики, аналитика и управление цехами</div>
+          </div>
+          <span class="role-arrow">→</span>
+        </button>
+      </div>
+      <button class="modal-close" onclick="closeModal()">Отмена</button>
+    </div>
+  </div>
+
+<section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-eyebrow">Швейная фабрика · Казахстан · с 2015 года</div>
+    <h1 class="hero-title">
+      AVISHU
+      <span>Clothing Manufacturer</span>
+    </h1>
+    <div class="hero-bottom">
+      <p class="hero-desc">
+        Производство одежды нового поколения — где технологии встречаются с качеством.
+        Мы создаём не просто ткань, а стандарт.
+      </p>
+      <div class="hero-stats">
+        <div>
+          <div class="hero-stat-num">N</div>
+          <div class="hero-stat-label">Клиентов</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">N</div>
+          <div class="hero-stat-label">Изделий в год</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">N</div>
+          <div class="hero-stat-label">Цехов</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <div class="scroll-line"></div>
+      <span>Прокрутить</span>
+    </div>
+  </section>
+
+<div class="marquee-wrap">
+    <div class="marquee-track">
+      <span class="marquee-item">Швейная фабрика</span>
+      <span class="marquee-item">Качество ткани</span>
+      <span class="marquee-item">3D Визуализация</span>
+      <span class="marquee-item">Франчайзинг</span>
+      <span class="marquee-item">Технологии производства</span>
+      <span class="marquee-item">AVISHU 2015</span>
+      <span class="marquee-item">Казахстан</span>
+      <span class="marquee-item">Инновации</span>
+      
+      <span class="marquee-item">Швейная фабрика</span>
+      <span class="marquee-item">Качество ткани</span>
+      <span class="marquee-item">3D Визуализация</span>
+      <span class="marquee-item">Франчайзинг</span>
+      <span class="marquee-item">Технологии производства</span>
+      <span class="marquee-item">AVISHU 2015</span>
+      <span class="marquee-item">Казахстан</span>
+      <span class="marquee-item">Инновации</span>
+    </div>
+  </div>
+
+<section class="section fade-up">
+    <div class="section-tag">О компании</div>
+    <div class="about-grid">
+      <div>
+        <h2 class="about-heading">
+          Девять лет мы шьём<br>
+          <em>будущее моды</em><br>
+          в Казахстане
+        </h2>
+        <p class="about-text">
+          AVISHU — швейная фабрика, основанная в 2015 году с миссией объединить
+          традиционное производство и современные цифровые технологии.
+          Мы первыми в регионе внедрили AI-контроль качества и 3D-примерку
+          прямо в производственный цикл.
+        </p>
+        <p class="about-text">
+          Наша платформа позволяет клиентам видеть готовое изделие ещё до начала
+          производства, а франчайзи — управлять сетью цехов в режиме реального времени.
+        </p>
+      </div>
+      <div>
+        <div class="about-feature">
+          <div class="feature-num">01</div>
+          <div>
+            <div class="feature-title">Контроль качества через AI</div>
+            <div class="feature-desc">
+              Обученные модели компьютерного зрения анализируют ткань по фотографии,
+              выявляя дефекты на ранних стадиях.
+            </div>
+          </div>
+        </div>
+        <div class="about-feature">
+          <div class="feature-num">02</div>
+          <div>
+            <div class="feature-title">3D-визуализация изделий</div>
+            <div class="feature-desc">
+              Клиент видит готовый продукт в объёме, выбирает расцветку и материал
+              ещё до запуска производства.
+            </div>
+          </div>
+        </div>
+        <div class="about-feature">
+          <div class="feature-num">03</div>
+          <div>
+            <div class="feature-title">Мобильное приложение</div>
+            <div class="feature-desc">
+              Полное управление заказами, статусами производства и коммуникацией
+              с фабрикой в вашем смартфоне.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<footer>
+    <img src="public/avishu.png" class="footer-logo" alt="AVISHU">
+    <div class="footer-text">© 2015–2026 AVISHU</div>
+  </footer>
+
+  <script src="src/main.js"></script>
+  <script>
+    function loginAs(role) {
+      closeModal();
+      if (role === 'client') window.location.href = 'demo.html';
+      if (role === 'franchisee') window.location.href = 'dashboards.html';
+    }
+  </script>
+</body>
+
+</html>

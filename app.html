@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AVISHU — Приложение</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/other.css">
+</head>
+
+<body>
+
+<div class="cursor" id="cursor">
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+  </div>
+
+<nav>
+    <a href="home.html" class="nav-logo">
+      <img src="public/avishu.png" alt="AVISHU">
+    </a>
+    <ul class="nav-links">
+      <li><a href="home.html">Главная</a></li>
+      <li><a href="app.html" class="active">Приложение</a></li>
+    </ul>
+    <button class="btn-login" onclick="window.location.href='registration.html'">Войти</button>
+  </nav>
+
+<div class="app-hero">
+    <div class="app-hero-bg"></div>
+    <img src="public/avishu.png" class="app-logo-large" alt="AVISHU">
+    <h1 class="app-hero-title">
+      Управляйте производством<br>
+      из любой точки мира
+    </h1>
+    <p class="app-hero-sub">
+      Приложение AVISHU — полный цикл работы с фабрикой в вашем смартфоне.
+      Заказы, статусы, 3D-примерка и прямой контакт с цехами.
+    </p>
+
+<div class="app-btns">
+      <a href="#" class="app-btn">
+        <div>
+          <div class="app-btn-label">Скачать на IOS</div>
+          <div class="app-btn-store"> через App Store</div>
+        </div>
+      </a>
+      <a href="#" class="app-btn">
+        <div>
+          <div class="app-btn-label">Скачать на Android</div>
+          <div class="app-btn-store"> через Google Play</div>
+        </div>
+      </a>
+    </div>
+
+<div class="screens-row">
+      <div class="screen-mock" style="transform:rotate(-4deg) translateY(20px);opacity:0.5">
+        <div class="screen-mock-inner">
+          <div class="screen-notch"></div>
+          <div class="screen-content-bar"></div>
+          <div class="screen-content-bar short"></div>
+          <div class="screen-content-block"></div>
+        </div>
+      </div>
+      <div class="screen-mock" style="z-index:2;transform:scale(1.08)">
+        <div class="screen-mock-inner">
+          <div class="screen-notch"></div>
+          <div class="screen-content-bar"></div>
+          <div class="screen-content-bar short"></div>
+          <div class="screen-content-block"></div>
+        </div>
+      </div>
+      <div class="screen-mock" style="transform:rotate(4deg) translateY(20px);opacity:0.5">
+        <div class="screen-mock-inner">
+          <div class="screen-notch"></div>
+          <div class="screen-content-bar"></div>
+          <div class="screen-content-bar short"></div>
+          <div class="screen-content-block"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="app-features">
+    <div class="app-feature">
+      <div class="app-feature-icon">3D</div>
+      <div class="app-feature-title">3D Примерка</div>
+      <div class="app-feature-text">
+        Просматривайте изделия в объёме, меняйте цвет и материал ещё до запуска в производство.
+      </div>
+    </div>
+    <div class="app-feature">
+      <div class="app-feature-icon">AI</div>
+      <div class="app-feature-title">AI Контроль качества</div>
+      <div class="app-feature-text">
+        Сфотографируйте ткань — нейросеть мгновенно определит класс материала и возможные дефекты.
+      </div>
+    </div>
+    <div class="app-feature">
+      <div class="app-feature-icon">CT</div>
+      <div class="app-feature-title">Управление заказами</div>
+      <div class="app-feature-text">
+        Создавайте, отслеживайте и управляйте заказами на всех этапах производства в одном месте.
+      </div>
+    </div>
+  </div>
+
+<section class="section fade-up">
+    <div class="section-tag">О приложении</div>
+    <div class="about-grid">
+      <div>
+        <h2 class="about-heading">
+          Фабрика<br>
+          <em>в вашем кармане</em>
+        </h2>
+        <p class="about-text">
+          AVISHU App — это мобильное продолжение нашей веб-платформы.
+          Разработано для двух типов пользователей: клиентов, которым важна
+          скорость и удобство работы с заказами, и франчайзи, которым нужен
+          полный контроль над производством.
+        </p>
+        <p class="about-text">
+          Приложение синхронизируется с нашей Supabase базой данных в реальном
+          времени, обеспечивая актуальность всех данных на любом устройстве.
+        </p>
+      </div>
+      </div>
+    </div>
+  </section>
+
+<footer>
+    <img src="public/avishu.png" class="footer-logo" alt="AVISHU">
+    <div class="footer-text">© 2015–2026 AVISHU</div>
+  </footer>
+
+  <script src="src/main.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AVISHU — Метрика</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/other.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+
+<body>
+
+<div class="cursor" id="cursor">
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+  </div>
+
+<nav>
+    <a href="home.html" class="nav-logo">
+      <img src="public/avishu.png" alt="AVISHU">
+    </a>
+    <ul class="nav-links">
+      <li><a href="home.html">Главная</a></li>
+      <li><a href="dashboards.html" class="active">Метрика</a></li>
+      <li><a href="app.html">Приложение</a></li>
+    </ul>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span id="userNameDisplay" style="font-size:11px;color:var(--gray-400);letter-spacing:0.06em"></span>
+      <button class="btn-login" id="btnLogout" onclick="handleLogout()">
+        Выйти
+      </button>
+    </div>
+  </nav>
+
+<div class="metrics-layout">
+
+<div class="metrics-header">
+      <div>
+        <div class="metrics-title">Метрика</div>
+        <div class="metrics-subtitle">Панель управления франчайзи · AVISHU Network</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="period-tabs">
+          <button class="period-tab active" data-period="7d" onclick="setPeriod(this,'7d')">7 дней</button>
+          <button class="period-tab" data-period="30d" onclick="setPeriod(this,'30d')">30 дней</button>
+          <button class="period-tab" data-period="90d" onclick="setPeriod(this,'90d')">3 месяца</button>
+          <button class="period-tab" data-period="1y" onclick="setPeriod(this,'1y')">Год</button>
+        </div>
+        <button class="btn-csv" onclick="downloadCSV()">⬇ Скачать CSV</button>
+      </div>
+    </div>
+
+<div class="metrics-body">
+
+<div id="connStatus" style="display:none;padding:10px 16px;margin-bottom:16px;font-size:11px;letter-spacing:0.04em;border:1px solid"></div>
+
+<div class="kpi-row">
+        <div class="kpi-card">
+          <div class="kpi-label">Доход за период</div>
+          <div class="kpi-value" id="kpiRevenue">—</div>
+          <div class="kpi-change up" id="kpiRevenueChange">загрузка...</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Заказов выполнено</div>
+          <div class="kpi-value" id="kpiOrders">—</div>
+          <div class="kpi-change up" id="kpiOrdersChange">загрузка...</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Средний чек</div>
+          <div class="kpi-value" id="kpiAvg">—</div>
+          <div class="kpi-change" id="kpiAvgChange"></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Загрузка цехов</div>
+          <div class="kpi-value" id="kpiLoad">—</div>
+          <div class="kpi-change up" id="kpiLoadChange"></div>
+        </div>
+      </div>
+
+<div class="calendar-row">
+        <div class="calendar-block">
+          <div class="calendar-title">Выбор периода для отчёта</div>
+          <div class="date-inputs">
+            <input type="date" class="date-input" id="dateFrom" value="2025-01-01">
+            <span class="date-sep">—</span>
+            <input type="date" class="date-input" id="dateTo">
+            <button class="btn-ghost" onclick="applyDates()">Применить</button>
+            <button class="btn-csv" onclick="downloadCSV()">⬇ CSV</button>
+          </div>
+        </div>
+      </div>
+
+<div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-card-title">
+            Доход по дням
+            <span id="chartPeriodLabel">— 7 дней</span>
+          </div>
+          <canvas id="revenueChart" height="200"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-title">Структура заказов</div>
+          <canvas id="ordersChart" height="200"></canvas>
+        </div>
+      </div>
+
+<div class="section-tag" style="border-top:none;padding-top:0;margin-bottom:20px">
+        Прогресс цехов
+      </div>
+      <div class="workshop-grid" id="workshopGrid">
+        
+      </div>
+
+    </div>
+  </div>
+
+  <script src="src/main.js"></script>
+  <script src="src/supabase.js"></script>
+  <script src="src/other.js"></script>
+  <script>
+    
+    (async function() {
+      if (!isLoggedIn()) {
+        window.location.href = 'registration.html';
+        return;
+      }
+
+const token = localStorage.getItem('avishu_token');
+      if (token && token !== 'demo_token' && typeof restoreSession === 'function') {
+        const session = await restoreSession();
+        if (!session) {
+          
+          window.location.href = 'registration.html';
+          return;
+        }
+      }
+
+const user = getCurrentUser();
+      if (user) {
+        const display = document.getElementById('userNameDisplay');
+        display.textContent = user.display_name || user.email;
+      }
+
+document.getElementById('dateTo').value = new Date().toISOString().split('T')[0];
+    })();
+
+function handleLogout() {
+      if (typeof authLogout === 'function') {
+        authLogout();
+      } else {
+        localStorage.removeItem('avishu_token');
+        localStorage.removeItem('avishu_role');
+        localStorage.removeItem('avishu_user');
+        window.location.href = 'registration.html';
+      }
+    }
+
+function showConnStatus(msg, type = 'info') {
+      const el = document.getElementById('connStatus');
+      el.style.display = 'block';
+      el.textContent = msg;
+      if (type === 'error') {
+        el.style.background = 'rgba(220, 38, 38, 0.08)';
+        el.style.borderColor = 'rgba(220, 38, 38, 0.3)';
+        el.style.color = '#fca5a5';
+      } else if (type === 'success') {
+        el.style.background = 'rgba(34, 197, 94, 0.08)';
+        el.style.borderColor = 'rgba(34, 197, 94, 0.3)';
+        el.style.color = '#86efac';
+        setTimeout(() => { el.style.display = 'none'; }, 3000);
+      } else {
+        el.style.background = 'rgba(59, 130, 246, 0.08)';
+        el.style.borderColor = 'rgba(59, 130, 246, 0.3)';
+        el.style.color = '#93c5fd';
+      }
+    }
+
+async function loadWorkshops() {
+      const data = await apiFetch('/api/metrics/workshops');
+      const grid = document.getElementById('workshopGrid');
+
+      if (data && data.data && data.data.length > 0) {
+        grid.innerHTML = data.data.map(w => `
+          <div class="workshop-card">
+            <div class="workshop-name">${w.workshop_name}</div>
+            <div class="workshop-meta">Смена ${w.shift} · ${w.operators} операторов</div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" style="width:${w.progress}%"></div>
+            </div>
+            <div class="progress-labels"><span>Прогресс</span><strong>${w.progress}%</strong></div>
+          </div>
+        `).join('');
+        return;
+      }
+
+const fallback = [
+        { name: 'Цех №1 — Крой', shift: 'A', operators: 24, progress: 92 },
+        { name: 'Цех №2 — Шитьё', shift: 'A/B', operators: 48, progress: 78 },
+        { name: 'Цех №3 — Отделка', shift: 'B', operators: 18, progress: 65 },
+        { name: 'Цех №4 — Контроль качества', shift: 'A', operators: 12, progress: 88 },
+        { name: 'Цех №5 — Упаковка', shift: 'B', operators: 10, progress: 55 },
+        { name: 'Цех №6 — Склад', shift: 'Круглосуточно', operators: 8, progress: 71 },
+      ];
+      grid.innerHTML = fallback.map(w => `
+        <div class="workshop-card">
+          <div class="workshop-name">${w.name}</div>
+          <div class="workshop-meta">Смена ${w.shift} · ${w.operators} операторов</div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" style="width:${w.progress}%"></div>
+          </div>
+          <div class="progress-labels"><span>Прогресс</span><strong>${w.progress}%</strong></div>
+        </div>
+      `).join('');
+    }
+
+document.addEventListener('DOMContentLoaded', async () => {
+      await initCharts();
+      await loadWorkshops();
+
+const testData = await apiFetch('/api/metrics/kpi?period=7d');
+      if (testData && testData.revenue && !testData.revenue.includes('—')) {
+        showConnStatus('✓ Данные загружены из Supabase', 'success');
+      } else {
+        showConnStatus('Работает в демо-режиме (mock data). Для реальных данных подключите Supabase.', 'info');
+      }
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AVISHU — Демо</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/other.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.183.2/build/three.module.js",
+        "three/examples/jsm/loaders/GLTFLoader.js": "https://cdn.jsdelivr.net/npm/three@0.183.2/examples/jsm/loaders/GLTFLoader.js",
+        "three/examples/jsm/controls/OrbitControls.js": "https://cdn.jsdelivr.net/npm/three@0.183.2/examples/jsm/controls/OrbitControls.js"
+      }
+    }
+  </script>
+</head>
+<body>
+
+<div class="cursor" id="cursor">
+  <div class="cursor-dot"  id="cursorDot"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+</div>
+
+<nav>
+  <a href="home.html" class="nav-logo">
+    <img src="public/avishu.png" alt="AVISHU">
+  </a>
+  <ul class="nav-links">
+    <li><a href="home.html">Главная</a></li>
+    <li><a href="demo.html" class="active">Демо</a></li>
+    <li><a href="app.html">Приложение</a></li>
+  </ul>
+  <button class="btn-login" onclick="localStorage.removeItem('avishu_token'); localStorage.removeItem('avishu_refresh_token'); localStorage.removeItem('avishu_role'); localStorage.removeItem('avishu_user'); window.location.href='registration.html'">
+    Выйти
+  </button>
+</nav>
+
+<div class="demo-layout">
+
+<div class="demo-viewer" id="demoViewerWrap">
+    <div class="demo-viewer-label">3D Просмотр — Реальные модели одежды</div>
+    <canvas id="three-canvas"></canvas>
+    <div class="demo-viewer-hint">Перетащите для вращения · Колесо для масштаба</div>
+    
+    <div class="viewer3d-rotation-bar">
+      <div class="viewer3d-rotation-fill" id="demoRotFill"></div>
+    </div>
+    
+    <div class="viewer3d-loading" id="demoLoading">
+      <div class="viewer3d-spinner"></div>
+      <span>Загрузка модели…</span>
+    </div>
+  </div>
+
+<div class="demo-panel">
+    <div class="demo-panel-title">Демо платформа</div>
+    <div class="demo-panel-sub">AVISHU · Примерка и анализ качества</div>
+
+<div class="panel-section-title">Выбор изделия</div>
+    <div class="clothing-grid">
+      <button class="clothing-item selected" data-model="shirt" onclick="selectClothingModel(this,'shirt')">
+        <span class="clothing-item-icon"></span>Рубашка
+      </button>
+      <button class="clothing-item" data-model="jacket" onclick="selectClothingModel(this,'jacket')">
+        <span class="clothing-item-icon"></span>Куртка
+      </button>
+      <button class="clothing-item" data-model="jeans" onclick="selectClothingModel(this,'jeans')">
+        <span class="clothing-item-icon"></span>Джинсы
+      </button>
+    </div>
+
+<div class="panel-section-title">Проверка качества ткани</div>
+    <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+      <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleUpload(this)">
+      <div class="upload-icon">⬆</div>
+      <div class="upload-text">
+        <strong>Загрузите фото ткани</strong>
+        JPG, PNG · до 10 МБ
+      </div>
+    </div>
+    <button class="btn-analyze" onclick="analyzeQuality()">
+      Запустить анализ AI
+    </button>
+
+<div class="quality-result" id="qualityResult">
+      <div style="display:flex;align-items:flex-end;gap:12px">
+        <div class="quality-score" id="qualityScore">87</div>
+        <div class="quality-label">Индекс качества</div>
+      </div>
+      <div class="quality-bar">
+        <div class="quality-bar-fill" id="qualityFill" style="width:0%"></div>
+      </div>
+      <div class="quality-metrics" id="qualityMetrics"></div>
+    </div>
+
+<div style="margin-top:32px;padding:16px;border:1px solid var(--border)">
+      <div style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gray-500);margin-bottom:6px">
+        AI Endpoint
+      </div>
+      <div style="font-size:11px;color:var(--gray-400);line-height:1.6">
+        POST <code style="color:var(--gray-200);font-size:10px">/api/ai/quality-check</code><br>
+        Python FastAPI · подключите свою модель в <code style="color:var(--gray-200);font-size:10px">ai/quality_model.py</code>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="src/main.js"></script>
+<script src="src/other.js"></script>
+
+<script type="module">
+  import * as THREE from 'three';
+  import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+  import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
+  const MODEL_MAP = {
+    shirt:  'public/shirt.glb',
+    jacket: 'public/jacket.glb',
+    jeans:  'public/jeans.glb',
+  };
+
+  const canvas  = document.getElementById('three-canvas');
+  const wrap    = document.getElementById('demoViewerWrap');
+  const loading = document.getElementById('demoLoading');
+  const rotFill = document.getElementById('demoRotFill');
+
+const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x111111);
+  scene.fog = new THREE.Fog(0x111111, 8, 20);
+
+const camera = new THREE.PerspectiveCamera(
+    45,
+    wrap.clientWidth / wrap.clientHeight,
+    0.1,
+    100
+  );
+  camera.position.set(0, 0.5, 3.5);
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+
+  const keyLight = new THREE.DirectionalLight(0xffffff, 1.0);
+  keyLight.position.set(5, 5, 5);
+  keyLight.castShadow = true;
+  keyLight.shadow.mapSize.set(1024, 1024);
+  keyLight.shadow.camera.near = 0.5;
+  keyLight.shadow.camera.far = 50;
+  scene.add(keyLight);
+
+  const fillLight = new THREE.DirectionalLight(0x8888ff, 0.3);
+  fillLight.position.set(-4, 2, -2);
+  scene.add(fillLight);
+
+  const rimLight = new THREE.DirectionalLight(0xffffff, 0.4);
+  rimLight.position.set(0, 4, -5);
+  scene.add(rimLight);
+
+const grid = new THREE.GridHelper(10, 20, 0x222222, 0x1a1a1a);
+  grid.position.y = -1.6;
+  scene.add(grid);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.enablePan = false;
+  controls.minDistance = 1.5;
+  controls.maxDistance = 6;
+
+const loader = new GLTFLoader();
+  let currentModel = null;
+
+  function normalizeModel(model) {
+    const box  = new THREE.Box3().setFromObject(model);
+    const size = new THREE.Vector3();
+    box.getSize(size);
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const scale  = 2.0 / maxDim;
+    model.scale.setScalar(scale);
+    const center = new THREE.Vector3();
+    box.getCenter(center);
+    model.position.sub(center.multiplyScalar(scale));
+  }
+
+  function loadModel(key) {
+    const path = MODEL_MAP[key];
+    if (!path) return;
+    loading.classList.add('show');
+
+    loader.load(
+      path,
+      (gltf) => {
+        if (currentModel) scene.remove(currentModel);
+        currentModel = gltf.scene;
+        normalizeModel(currentModel);
+        scene.add(currentModel);
+        loading.classList.remove('show');
+      },
+      undefined,
+      (err) => {
+        console.error('Model load error:', err);
+        loading.classList.remove('show');
+      }
+    );
+  }
+
+window.selectClothingModel = function(el, type) {
+    document.querySelectorAll('.clothing-item').forEach(i => i.classList.remove('selected'));
+    el.classList.add('selected');
+    loadModel(type);
+  };
+
+function updateRotationIndicator() {
+    if (!currentModel) return;
+    let angle = currentModel.rotation.y % (2 * Math.PI);
+    if (angle < 0) angle += 2 * Math.PI;
+    rotFill.style.width = ((angle / (2 * Math.PI)) * 100) + '%';
+  }
+
+function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    updateRotationIndicator();
+    renderer.render(scene, camera);
+  }
+  animate();
+
+const ro = new ResizeObserver(() => {
+    const w = wrap.clientWidth;
+    const h = wrap.clientHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  });
+  ro.observe(wrap);
+
+loadModel('shirt');
+</script>
+</body>
+</html>
